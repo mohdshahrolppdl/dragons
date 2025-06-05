@@ -58,36 +58,30 @@
 
   <script>
     const start = async () => {
-      const mindarThree = new window.MINDAR.IMAGE.MindARThree({
-        container: document.body,
-        imageTargetSrc: "./assets/targets.mind",
-        maxTrack: 1
-      });
+      const models = Array.from({ length: 10 }, (_, i) => document.getElementById(`model-${i}`));
 
-      const { renderer, scene, camera } = mindarThree;
+      for (let i = 0; i < 10; i++) {
+        const mindarThree = new window.MINDAR.IMAGE.MindARThree({
+          container: document.body,
+          imageTargetSrc: `./assets/target-${i}.mind`,
+          maxTrack: 1
+        });
 
-      const iframes = Array.from({ length: 10 }, (_, i) => document.getElementById(`model-${i}`));
-
-      const anchors = iframes.map((_, index) => {
-        const anchor = mindarThree.addAnchor(index);
+        const { renderer, scene, camera } = mindarThree;
+        const anchor = mindarThree.addAnchor(0);
 
         anchor.onTargetFound = () => {
-          iframes.forEach(iframe => iframe.style.display = 'none'); // Hide all
-          iframes[index].style.display = 'block'; // Show current
+          models.forEach(m => m.style.display = 'none');
+          models[i].style.display = 'block';
         };
 
         anchor.onTargetLost = () => {
-          iframes[index].style.display = 'none'; // Hide when lost
+          models[i].style.display = 'none';
         };
 
-        return anchor;
-      });
-
-      await mindarThree.start();
-
-      renderer.setAnimationLoop(() => {
-        renderer.render(scene, camera);
-      });
+        await mindarThree.start();
+        renderer.setAnimationLoop(() => renderer.render(scene, camera));
+      }
     };
 
     start();
