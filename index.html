@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Multiple AR Marker Trial</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- MindAR + Three.js -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.4/dist/mindar-image-three.prod.js"></script>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: black;
+    }
+
+    iframe {
+      position: absolute;
+      width: 320px;
+      height: 480px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: none;
+      display: none;
+      z-index: 10;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 10 iframes, one for each Sketchfab model -->
+  <!--Replace MODEL_ID_1 with Example: "https://sketchfab.com/models/59fc99d8dcb146f3a6c16dbbcc4680da/embed?autostart=1&transparent=1"--!>
+    <!--model ID is 59fc99d8dcb146f3a6c16dbbcc4680da--!>
+  <iframe id="model-0" src="https://sketchfab.com/models/9551e49684f644cf8716a5ac77515237/embed?autostart=1&transparent=1" allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen></iframe>
+  <iframe id="model-1" src="https://sketchfab.com/models/66f01ab2a0fd4a589ddecb0a565adfba/embed?autostart=1&transparent=1" allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen></iframe>
+  <iframe id="model-2" src="https://sketchfab.com/models/0124363586084e1580c7b58ef1b86c92/embed?autostart=1&transparent=1" allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen></iframe>
+  <iframe id="model-3" src="https://sketchfab.com/models/3cf3ffb1ca8b40a3b8e6dff7b7179539/embed?autostart=1&transparent=1" allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen></iframe>
+  <iframe id="model-4" src="https://sketchfab.com/models/4d4b209a7f914057bf0f8c6902aae4b0/embed?autostart=1&transparent=1" allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen></iframe>
+  <iframe id="model-5" src="https://sketchfab.com/models/5e3fceb1efb04b1e8dffdef38d3dc01e/embed?autostart=1&transparent=1" allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen></iframe>
+  <iframe id="model-6" src="https://sketchfab.com/models/b480760cfff54313b319848cdc5eccb2/embed?autostart=1&transparent=1" allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen></iframe>
+  <iframe id="model-7" src="https://sketchfab.com/models/ec2e3d525dc24459a65d24b30da56e54/embed?autostart=1&transparent=1" allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen></iframe>
+
+
+  <script>
+    const start = async () => {
+      const mindarThree = new window.MINDAR.IMAGE.MindARThree({
+        container: document.body,
+        imageTargetSrc: "./assets/targets.mind",
+        maxTrack: 1
+      });
+
+      const { renderer, scene, camera } = mindarThree;
+
+      const iframes = Array.from({ length: 10 }, (_, i) => document.getElementById(`model-${i}`));
+
+      const anchors = iframes.map((_, index) => {
+        const anchor = mindarThree.addAnchor(index);
+
+        anchor.onTargetFound = () => {
+          iframes.forEach(iframe => iframe.style.display = 'none'); // Hide all
+          iframes[index].style.display = 'block'; // Show current
+        };
+
+        anchor.onTargetLost = () => {
+          iframes[index].style.display = 'none'; // Hide when lost
+        };
+
+        return anchor;
+      });
+
+      await mindarThree.start();
+
+      renderer.setAnimationLoop(() => {
+        renderer.render(scene, camera);
+      });
+    };
+
+    start();
+  </script>
+</body>
+</html>
